@@ -145,6 +145,34 @@
       (markdown-demote)
     (evil-shift-right-line 1)))
 
+(defun evil-markdown-open-below (count)
+  "Clever insertion of markdown item.
+Argument COUNT number of lines to insert.
+Passing in any prefix argument, executes the command without special behavior."
+  (interactive "P")
+  (cond ((markdown-table-at-point-p)
+         (markdown-table-insert-row t)
+         (evil-insert nil))
+        ((markdown-list-item-at-point-p)
+         (end-of-visible-line)
+         (markdown-insert-list-item 0)
+         (evil-append nil))
+        ((evil-open-below count))))
+
+(defun evil-markdown-open-above (count)
+  "Clever insertion of markdown item.
+Argument COUNT number of lines to insert.
+Passing in any prefix argument, executes the command without special behavior."
+  (interactive "P")
+  (cond ((markdown-table-at-point-p)
+         (markdown-table-insert-row)
+         (evil-insert nil))
+        ((markdown-list-item-at-point-p)
+         (beginning-of-line)
+         (markdown-insert-list-item 0)
+         (evil-append nil))
+        ((evil-open-above count))))
+
 ;;; Text objects
 (evil-define-text-object markdown-element-textobj (count &optional beg end type)
   "A markdown element."
@@ -165,7 +193,10 @@
         (kbd "<") 'evil-markdown-shift-left
         (kbd ">") 'evil-markdown-shift-right
         (kbd "<tab>") 'markdown-cycle
-        (kbd "<S-tab>") 'markdown-shifttab))))
+        (kbd "<S-tab>") 'markdown-shifttab))
+    (evil-define-key 'normal 'evil-markdown-mode
+      (kbd "o") 'evil-markdown-open-below
+      (kbd "O") 'evil-markdown-open-above)))
 
 (defun evil-markdown--populate-insert-bindings ()
   "Define insert mode bindings."
